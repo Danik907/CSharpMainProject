@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Model.Runtime.Projectiles;
 using UnityEngine;
 
@@ -18,11 +20,28 @@ namespace UnitBrains.Player
             float overheatTemperature = OverheatTemperature;
             ///////////////////////////////////////
             // Homework 1.3 (1st block, 3rd module)
-            ///////////////////////////////////////           
-            var projectile = CreateProjectile(forTarget);
-            AddProjectileToList(projectile, intoList);
-            ///////////////////////////////////////
-        }
+            ///////////////////////////////////////  
+            ///
+
+            if (GetTemperature() >= overheatTemperature)
+            {
+                return; 
+            }
+            
+            IncreaseTemperature();
+
+            for (float i = 0 ; i < GetTemperature () ; i++) 
+            {
+          
+                    var projectile = CreateProjectile(forTarget);
+                    AddProjectileToList(projectile, intoList);
+                   
+            }
+                
+            
+           
+                ///////////////////////////////////////
+        }   
 
         public override Vector2Int GetNextStep()
         {
@@ -34,6 +53,10 @@ namespace UnitBrains.Player
             ///////////////////////////////////////
             // Homework 1.4 (1st block, 4rd module)
             ///////////////////////////////////////
+            ///
+                
+
+
             List<Vector2Int> result = GetReachableTargets();
             while (result.Count > 1)
             {
