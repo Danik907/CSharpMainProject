@@ -28,8 +28,6 @@ namespace UnitBrains.Player
                 return; 
             }
             
-            IncreaseTemperature();
-
             for (float i = 0 ; i < GetTemperature () ; i++) 
             {
           
@@ -37,10 +35,10 @@ namespace UnitBrains.Player
                     AddProjectileToList(projectile, intoList);
                    
             }
-                
-            
-           
-                ///////////////////////////////////////
+            IncreaseTemperature();
+
+
+            ///////////////////////////////////////
         }   
 
         public override Vector2Int GetNextStep()
