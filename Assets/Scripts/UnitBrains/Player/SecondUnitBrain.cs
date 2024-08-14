@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Model;
 using Model.Runtime.Projectiles;
 using UnityEngine;
+using Utilities;
 
 namespace UnitBrains.Player
 {
@@ -14,7 +16,8 @@ namespace UnitBrains.Player
         private float _temperature = 0f;
         private float _cooldownTime = 0f;
         private bool _overheated;
-        
+        List<Vector2Int> DontReachTarget = new List<Vector2Int>();
+
         protected override void GenerateProjectiles(Vector2Int forTarget, List<BaseProjectile> intoList)
         {
             float overheatTemperature = OverheatTemperature;
@@ -43,7 +46,15 @@ namespace UnitBrains.Player
 
         public override Vector2Int GetNextStep()
         {
-            return base.GetNextStep();
+            Vector2Int target = DontReachTarget[0];
+            if (DontReachTarget.Count > 0 && !IsTargetInRange(target))
+            {
+                return unit.Pos.CalcNextStepTowards(target);
+            }
+            else
+            {
+                return unit.Pos;
+            }
         }
 
         protected override List<Vector2Int> SelectTargets()
@@ -52,39 +63,53 @@ namespace UnitBrains.Player
             // Homework 1.4 (1st block, 4rd module)
             ///////////////////////////////////////
             ///
-                
+
             List<Vector2Int> result = GetReachableTargets();
+            result = new List<Vector2Int>();
+            DontReachTarget.Clear();
 
             float minDistance = float.MaxValue;
             Vector2Int nearestTarget = Vector2Int.zero;
-
-            if (result.Count == 0)
+           
+            foreach (var target in GetAllTargets())
             {
-                return result;
-            }
-
-            foreach (var f in result)
-            {
-                float distance = DistanceToOwnBase(f);
+                float distance = DistanceToOwnBase(target);
 
                 if (minDistance >= distance)
                 {
 
                     minDistance = distance;
-                    nearestTarget = f;
-                   
+                    nearestTarget = target;
                 }
-
+                result.Add(target);
             }
 
+            if (IsTargetInRange(nearestTarget))
+            {
+                result.Add(nearestTarget);
+            }
+            else
+            {
+                DontReachTarget.Add(nearestTarget);
+            }
 
-            result.Clear();
-            result.Add(nearestTarget);
-            return result;
-
-            ///////////////////////////////////////
+            if (result.Count == 0 && DontReachTarget.Count == 0)
+            {
+                
+                if (IsTargetInRange(runtimeModel.RoMap.Bases[IsPlayerUnitBrain ? RuntimeModel.BotPlayerId : RuntimeModel.PlayerId]))
+                {
+                    result.Add(runtimeModel.RoMap.Bases[IsPlayerUnitBrain ? RuntimeModel.BotPlayerId : RuntimeModel.PlayerId]);
+                    return result;
+                }
+                DontReachTarget.Add(runtimeModel.RoMap.Bases[IsPlayerUnitBrain ? RuntimeModel.BotPlayerId : RuntimeModel.PlayerId]);
+                return result;
+            }
+            else
+            {
+                return result;
+            }
         }
-
+                           
         public override void Update(float deltaTime, float time)
         {
             if (_overheated)
