@@ -28,21 +28,21 @@ namespace UnitBrains.Player
 
             if (GetTemperature() >= overheatTemperature)
             {
-                return; 
+                return;
             }
-            
-            for (float i = 0 ; i < GetTemperature () ; i++) 
+
+            for (float i = 0; i < GetTemperature(); i++)
             {
-          
-                    var projectile = CreateProjectile(forTarget);
-                    AddProjectileToList(projectile, intoList);
-                   
+
+                var projectile = CreateProjectile(forTarget);
+                AddProjectileToList(projectile, intoList);
+
             }
             IncreaseTemperature();
 
 
             ///////////////////////////////////////
-        }   
+        }
 
         public override Vector2Int GetNextStep()
         {
@@ -64,13 +64,12 @@ namespace UnitBrains.Player
             ///////////////////////////////////////
             ///
 
-            List<Vector2Int> result = GetReachableTargets();
-            result = new List<Vector2Int>();
+            List<Vector2Int> result = new List<Vector2Int>();
             DontReachTarget.Clear();
 
             float minDistance = float.MaxValue;
             Vector2Int nearestTarget = Vector2Int.zero;
-           
+
             foreach (var target in GetAllTargets())
             {
                 float distance = DistanceToOwnBase(target);
@@ -93,14 +92,14 @@ namespace UnitBrains.Player
                 DontReachTarget.Add(nearestTarget);
             }
 
-            if (result.Count == 0 && DontReachTarget.Count == 0)
+
+            if (result.Count == 0)
             {
-                
                 if (IsTargetInRange(runtimeModel.RoMap.Bases[IsPlayerUnitBrain ? RuntimeModel.BotPlayerId : RuntimeModel.PlayerId]))
                 {
                     result.Add(runtimeModel.RoMap.Bases[IsPlayerUnitBrain ? RuntimeModel.BotPlayerId : RuntimeModel.PlayerId]);
                     return result;
-                }
+                }              
                 DontReachTarget.Add(runtimeModel.RoMap.Bases[IsPlayerUnitBrain ? RuntimeModel.BotPlayerId : RuntimeModel.PlayerId]);
                 return result;
             }
@@ -109,6 +108,8 @@ namespace UnitBrains.Player
                 return result;
             }
         }
+
+    
                            
         public override void Update(float deltaTime, float time)
         {
