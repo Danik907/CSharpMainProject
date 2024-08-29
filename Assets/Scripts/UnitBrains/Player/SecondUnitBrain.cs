@@ -4,6 +4,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Model;
 using Model.Runtime.Projectiles;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Utilities;
 
 namespace UnitBrains.Player
@@ -46,14 +47,27 @@ namespace UnitBrains.Player
 
         public override Vector2Int GetNextStep()
         {
-            Vector2Int target = DontReachTarget[0];
-            if (DontReachTarget.Count > 0 && !IsTargetInRange(target))
+            Vector2Int position = unit.Pos;
+            Vector2Int nextPosition = new Vector2Int();
+            Vector2Int target;
+
+            if (DontReachTarget.Count > 0)
             {
-                return unit.Pos.CalcNextStepTowards(target);
+                target = DontReachTarget[0];
             }
             else
             {
-                return unit.Pos;
+                return position; 
+            }
+            
+            if (IsTargetInRange(target))
+            {
+                return position;
+            }
+            else
+            {
+                nextPosition = target;
+                return position.CalcNextStepTowards(nextPosition);
             }
         }
 
@@ -65,49 +79,55 @@ namespace UnitBrains.Player
             ///
 
             List<Vector2Int> result = new List<Vector2Int>();
-            DontReachTarget.Clear();
+            var allTargets = GetAllTargets();
 
             float minDistance = float.MaxValue;
             Vector2Int nearestTarget = Vector2Int.zero;
 
-            foreach (var target in GetAllTargets())
+            if (allTargets != null)
             {
-                float distance = DistanceToOwnBase(target);
-
-                if (minDistance >= distance)
+                foreach (Vector2Int target in GetAllTargets())
                 {
-
-                    minDistance = distance;
-                    nearestTarget = target;
+                    if (DistanceToOwnBase(target) < minDistance)
+                    {
+                        minDistance = DistanceToOwnBase(target);
+                        nearestTarget = target;
+                    }
                 }
-                result.Add(target);
-            }
-
-            if (IsTargetInRange(nearestTarget))
-            {
-                result.Add(nearestTarget);
-            }
-            else
-            {
+                DontReachTarget.Clear();
                 DontReachTarget.Add(nearestTarget);
-            }
-
-
-            if (result.Count == 0)
-            {
-                if (IsTargetInRange(runtimeModel.RoMap.Bases[IsPlayerUnitBrain ? RuntimeModel.BotPlayerId : RuntimeModel.PlayerId]))
+                if (IsTargetInRange(nearestTarget))
                 {
-                    result.Add(runtimeModel.RoMap.Bases[IsPlayerUnitBrain ? RuntimeModel.BotPlayerId : RuntimeModel.PlayerId]);
-                    return result;
-                }              
-                DontReachTarget.Add(runtimeModel.RoMap.Bases[IsPlayerUnitBrain ? RuntimeModel.BotPlayerId : RuntimeModel.PlayerId]);
-                return result;
+                    result.Add(nearestTarget);
+                }
             }
-            else
-            {
-                return result;
-            }
-        }
+                if (minDistance < float.MaxValue)
+                {
+                    if (IsTargetInRange(nearestTarget))
+                    {
+                        result.Add(nearestTarget);
+                    }
+                    else
+                    {
+                        int playerID = IsPlayerUnitBrain ? RuntimeModel.PlayerId : RuntimeModel.BotPlayerId;
+                        Vector2Int enemyBase = runtimeModel.RoMap.Bases[playerID];
+                        DontReachTarget.Add(enemyBase);
+                    }
+                }
+                if (result.Count > 0)
+                {
+                    result.Clear();
+                    result.Add(nearestTarget);
+                }
+
+                while (result.Count > 1)
+                {
+                    result.RemoveAt(result.Count - 1);
+                }
+
+            
+            return result;
+        }   
 
     
                            
