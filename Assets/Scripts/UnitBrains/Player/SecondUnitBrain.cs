@@ -17,7 +17,11 @@ namespace UnitBrains.Player
         private float _temperature = 0f;
         private float _cooldownTime = 0f;
         private bool _overheated;
+
         List<Vector2Int> DontReachTarget = new List<Vector2Int>();
+        private static int UnitCounter = 0;
+        public int UnitID;
+        public const int UnitMaxCount = 3;
 
         protected override void GenerateProjectiles(Vector2Int forTarget, List<BaseProjectile> intoList)
         {
@@ -32,7 +36,7 @@ namespace UnitBrains.Player
                 return;
             }
 
-            for (float i = 0; i < GetTemperature(); i++)
+            for (float i = 0; i <= GetTemperature(); i++)
             {
 
                 var projectile = CreateProjectile(forTarget);
@@ -79,57 +83,48 @@ namespace UnitBrains.Player
             ///
 
             List<Vector2Int> result = new List<Vector2Int>();
-            var allTargets = GetAllTargets();
+            Vector2Int targetPosition;
 
-            float minDistance = float.MaxValue;
-            Vector2Int nearestTarget = Vector2Int.zero;
+            DontReachTarget.Clear();
 
-            if (allTargets != null)
+            foreach (Vector2Int target in GetAllTargets())
             {
-                foreach (Vector2Int target in GetAllTargets())
-                {
-                    if (DistanceToOwnBase(target) < minDistance)
-                    {
-                        minDistance = DistanceToOwnBase(target);
-                        nearestTarget = target;
-                    }
-                }
-                DontReachTarget.Clear();
-                DontReachTarget.Add(nearestTarget);
-                if (IsTargetInRange(nearestTarget))
-                {
-                    result.Add(nearestTarget);
-                }
+                DontReachTarget.Add(target);
             }
-                if (minDistance < float.MaxValue)
+            if (DontReachTarget.Count == 0)
+            {
+                int playerID = IsPlayerUnitBrain ? RuntimeModel.PlayerId : RuntimeModel.BotPlayerId;
+                Vector2Int enemyBase = runtimeModel.RoMap.Bases[playerID];
+                DontReachTarget.Add(enemyBase);
+            }
+            else
+            {
+                SortByDistanceToOwnBase(DontReachTarget);
+
+                int targetIndex = UnitID % UnitMaxCount;
+
+                if (targetIndex > (DontReachTarget.Count - 1))
                 {
-                    if (IsTargetInRange(nearestTarget))
+                    targetPosition = DontReachTarget[0];
+                }
+                else
+                {
+                    if (targetIndex == 0)
                     {
-                        result.Add(nearestTarget);
+                        targetPosition = DontReachTarget[targetIndex];
                     }
                     else
                     {
-                        int playerID = IsPlayerUnitBrain ? RuntimeModel.PlayerId : RuntimeModel.BotPlayerId;
-                        Vector2Int enemyBase = runtimeModel.RoMap.Bases[playerID];
-                        DontReachTarget.Add(enemyBase);
+                        targetPosition = DontReachTarget[targetIndex - 1];
                     }
-                }
-                if (result.Count > 0)
-                {
-                    result.Clear();
-                    result.Add(nearestTarget);
+
                 }
 
-                while (result.Count > 1)
-                {
-                    result.RemoveAt(result.Count - 1);
-                }
-
-            
+                if (IsTargetInRange(targetPosition))
+                    result.Add(targetPosition);
+            }
             return result;
-        }   
-
-    
+        }
                            
         public override void Update(float deltaTime, float time)
         {
