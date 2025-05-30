@@ -38,10 +38,8 @@ namespace UnitBrains.Player
 
             for (float i = 0; i <= GetTemperature(); i++)
             {
-
                 var projectile = CreateProjectile(forTarget);
                 AddProjectileToList(projectile, intoList);
-
             }
             IncreaseTemperature();
 
@@ -49,38 +47,39 @@ namespace UnitBrains.Player
             ///////////////////////////////////////
         }
 
-        public override Vector2Int GetNextStep()
-        {
-            Vector2Int position = unit.Pos;
-            Vector2Int nextPosition = new Vector2Int();
-            Vector2Int target;
+        //public override Vector2Int GetNextStep()
+        //{
+        //    Vector2Int position = unit.Pos;
+        //    Vector2Int nextPosition = new Vector2Int();
+        //    Vector2Int target;
 
-            if (DontReachTarget.Count > 0)
-            {
-                target = DontReachTarget[0];
-            }
-            else
-            {
-                return position; 
-            }
-            
-            if (IsTargetInRange(target))
-            {
-                return position;
-            }
-            else
-            {
-                nextPosition = target;
-                return position.CalcNextStepTowards(nextPosition);
-            }
-        }
+        //    if (DontReachTarget.Count > 0)
+        //    {
+        //        target = DontReachTarget[0];
+        //    }
+        //    else
+        //    {
+        //        return position;
+        //    }
+
+        //    if (IsTargetInRange(target))
+        //    {
+        //        return position;
+        //    }
+        //    else
+        //    {
+        //        nextPosition = target;
+        //        return position.CalcNextStepTowards(nextPosition);
+        //    }
+
+        //}
 
         protected override List<Vector2Int> SelectTargets()
         {
             ///////////////////////////////////////
             // Homework 1.4 (1st block, 4rd module)
             ///////////////////////////////////////
-            ///
+            ///           
 
             List<Vector2Int> result = new List<Vector2Int>();
             Vector2Int targetPosition;
@@ -125,6 +124,8 @@ namespace UnitBrains.Player
             }
             return result;
         }
+
+       
                            
         public override void Update(float deltaTime, float time)
         {

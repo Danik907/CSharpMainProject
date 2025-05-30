@@ -10,7 +10,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{A49BA194-5C47-A0B3-F237-E5A208BF7BB2}</ProjectGuid>
+    <ProjectGuid>{3465F446-5C06-0730-7586-F2DE657D5DC9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Tests</AssemblyName>
@@ -716,7 +716,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Root.csproj">
-      <Project>{C12C09C7-888C-7364-148B-3BC33A05AB3F}</Project>
+      <Project>{30E4A36B-DBC1-3EB5-7C27-41F2EDC2C301}</Project>
       <Name>Root</Name>
     </ProjectReference>
   </ItemGroup>
